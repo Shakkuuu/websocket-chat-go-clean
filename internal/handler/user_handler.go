@@ -81,11 +81,11 @@ func (h *UserHandler) Menu(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Printf("userUsecase.GetByID error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -155,11 +155,11 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Printf("userUsecase.GetByID error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
 			if err != nil {
@@ -179,7 +179,7 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			log.Printf("participatingRoomUsecase.GetByUserID error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
 			if err != nil {
@@ -201,7 +201,7 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 				log.Printf("participatingRoomUsecase.DeleteByRoomID error: %v\n", err)
 				// メッセージをテンプレートに渡す
 				var data Data
-				data.Message = "データベースとの接続に失敗しました。"
+				data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 				err := h.templates.ExecuteTemplate(w, "usermenu.html", data)
 				if err != nil {
@@ -218,7 +218,7 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 				log.Printf("roomUsecase.Delete error: %v\n", err)
 				// メッセージをテンプレートに渡す
 				var data Data
-				data.Message = "データベースとの接続に失敗しました。"
+				data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 				err := h.templates.ExecuteTemplate(w, "usermenu.html", data)
 				if err != nil {
@@ -237,7 +237,7 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			log.Printf("participatingRoomUsecase.DeleteByUserID error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
 			if err != nil {
@@ -254,7 +254,7 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			log.Printf("userUsecase.Delete error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
 			if err != nil {
@@ -327,11 +327,11 @@ func (h *UserHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Printf("userUsecase.GetByID error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
 			if err != nil {
@@ -417,7 +417,7 @@ func (h *UserHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 			log.Printf("userUsecase.Update error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
 			if err != nil {
@@ -508,7 +508,7 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 			log.Printf("model.AddUser error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err := h.templates.ExecuteTemplate(w, "signup.html", data)
 			if err != nil {
@@ -585,11 +585,11 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Printf("userUsecase.GetByName error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "login.html", data)
 			if err != nil {

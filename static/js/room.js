@@ -90,18 +90,18 @@ function updateMessage(roomid, message, name, toname, aus, ous) {
     let nameText = document.createTextNode(roomid + " : " + name + "→" + toname);
     listName.appendChild(nameText);
 
-    let messages = document.createElement("ul");
-
-    let listMessage = document.createElement("li");
-    let messageText = document.createTextNode(message);
-    listMessage.appendChild(messageText);
-
-    messages.appendChild(listMessage);
-
-    listName.appendChild(messages);
-
     let ul = document.getElementById("messages");
     ul.appendChild(listName);
+    let messageContainer = document.createElement("div");
+    messageContainer.className = "message";
+
+    let messageText = document.createElement("span");
+    messageText.innerHTML = message;
+
+    messageContainer.appendChild(messageText);
+
+    let messageList = document.getElementById("messages");
+    messageList.appendChild(messageContainer);
 }
 
 // サーバーにメッセージを送信する

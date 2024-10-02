@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Shakkuuu/websocket-chat-go-clean/internal/domain"
@@ -87,11 +88,11 @@ func (h *RoomHandler) Top(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Printf("userUsecase.GetByID error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -108,7 +109,7 @@ func (h *RoomHandler) Top(w http.ResponseWriter, r *http.Request) {
 			log.Printf("roomUsecase.Create error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -131,7 +132,7 @@ func (h *RoomHandler) Top(w http.ResponseWriter, r *http.Request) {
 			log.Printf("participatingRoomUsecase.Create error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -173,13 +174,43 @@ func (h *RoomHandler) Room(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		roomid := r.URL.Query().Get("roomid")
 
+		intRoomID, err := strconv.Atoi(roomid)
+		if err != nil {
+			log.Printf("strconv.Atoi error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = "ルームIDの形式が正しくありません。"
+
+			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
+		if intRoomID < 1 || 9999 < intRoomID {
+			log.Println("ルームIDの範囲外です。")
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = "ルームIDの範囲外です。"
+
+			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
+
 		// Roomが存在するか確認
 		exists, err := h.roomUsecase.IDExists(ctx, roomid)
 		if err != nil {
 			log.Printf("roomUsecase.IDExists error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -235,7 +266,7 @@ func (h *RoomHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			log.Printf("roomUsecase.IDExists error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -293,11 +324,11 @@ func (h *RoomHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Printf("userUsecase.GetByID error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -313,7 +344,7 @@ func (h *RoomHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			log.Printf("participatingRoomUsecase.GetByUserIDAndRoomID error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -332,7 +363,7 @@ func (h *RoomHandler) Delete(w http.ResponseWriter, r *http.Request) {
 				log.Printf("participatingRoomUsecase.DeleteByUserIDAndRoomID error: %v\n", err)
 				// メッセージをテンプレートに渡す
 				var data Data
-				data.Message = "データベースとの接続に失敗しました。"
+				data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 				err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 				if err != nil {
@@ -362,7 +393,7 @@ func (h *RoomHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			log.Printf("participatingRoomUsecase.DeleteByRoomID error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -379,7 +410,7 @@ func (h *RoomHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			log.Printf("roomUsecase.Delete error: %v\n", err)
 			// メッセージをテンプレートに渡す
 			var data Data
-			data.Message = "データベースとの接続に失敗しました。"
+			data.Message = fmt.Sprintf("データベースとの接続に失敗しました。(%v)", err)
 
 			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 			if err != nil {
@@ -438,7 +469,7 @@ func (h *RoomHandler) JoinRoomsList(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "User Not Found", http.StatusUnauthorized)
 			return
 		}
-		if err != nil {
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Printf("userUsecase.GetByID error: %v\n", err)
 			http.Error(w, fmt.Sprintf("userUsecase.GetByID error: %v", err), http.StatusInternalServerError)
 			return

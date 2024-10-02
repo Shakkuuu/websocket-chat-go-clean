@@ -14,6 +14,8 @@ import (
 	"github.com/Shakkuuu/websocket-chat-go-clean/internal/usecase"
 	"github.com/Shakkuuu/websocket-chat-go-clean/pkg/session"
 	"github.com/Shakkuuu/websocket-chat-go-clean/pkg/timefmt"
+	"github.com/microcosm-cc/bluemonday"
+	"github.com/russross/blackfriday/v2"
 	"golang.org/x/net/websocket"
 	"gorm.io/gorm"
 )
@@ -84,9 +86,8 @@ func (h *WebsocketHandler) HandleConnection(ws *websocket.Conn) {
 	_, err = h.participatingRoomUsecase.GetByUserIDAndRoomID(ctx, userID, room.ID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		notExists = true
-		return
 	}
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		log.Printf("participatingRoomUsecase.GetByUserIDAndRoomID error: %v\n", err)
 		return
 	}
@@ -229,6 +230,11 @@ func (h *WebsocketHandler) HandleConnection(ws *websocket.Conn) {
 			log.Printf("Receive error:%v\n", err)
 		}
 
+		htmlmsg := blackfriday.Run([]byte(msg.Message))
+		policy := bluemonday.UGCPolicy()
+		sanitizedHTML := policy.SanitizeBytes(htmlmsg)
+		msg.Message = string(sanitizedHTML)
+
 		// goroutineでチャネルを待っているとこへメッセージを渡す
 		sentmessage <- msg
 	}
@@ -260,6 +266,8 @@ func (h *WebsocketHandler) HandleMessages() {
 			for client, name := range room.Clients {
 				if msg.ToName == name || msg.Name == name {
 					// メッセージを返信する
+					policy := bluemonday.UGCPolicy()
+					msg.ToName = policy.Sanitize(msg.ToName)
 					err := websocket.JSON.Send(client, Message{RoomID: room.ID, Message: msg.Message, Name: msg.Name, ToName: msg.ToName, AllUsers: msg.AllUsers, OnlineUsers: msg.OnlineUsers})
 					if err != nil {
 						log.Printf("Send error:%v\n", err)
