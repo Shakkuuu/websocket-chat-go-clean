@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/favicon.ico" />
+    <link rel="stylesheet" href="/static/css/main.css">
+    <title>RoomTop</title>
+    <script src="/static/js/roomtop.js"></script>
+</head>
+<body>
+<h1>RoomTop</h1>
+
+{{.Message}}
+
+<h2>Room一覧</h2>
+<ul id="rooms"></ul>
+<button onclick="getRooms()">更新</button>
+
+<h2>参加中のRoom一覧</h2>
+<ul id="joinrooms"></ul>
+<button onclick="getJoinRooms()">更新</button>
+
+<p>部屋の作成</p>
+<form method="POST" action="/" required="required">
+    <input type="submit" value="作成">
+</form>
+
+<p>参加するチャットルームのIDを入力してください。(1 ~ 9999)</p>
+<input type="number" min="1" max="999" id="enter_roomid" placeholder="参加する部屋番号">
+<button onclick="enterRoom()">参加</button>
+
+<p><a href="/login">ログイン</a></p>
+<p><a href="/usermenu">ユーザーメニュー</a></p>
+
+<p>削除するチャットルームのIDを入力してください。(1 ~ 999)</p>
+<input type="number" min="1" max="999" id="delete_roomid" placeholder="参加する部屋番号">
+<button onclick="deleteRoom()">部屋削除</button>
+
+</body>
+</html>

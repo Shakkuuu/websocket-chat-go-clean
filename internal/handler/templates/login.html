@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/favicon.ico" />
+    <link rel="stylesheet" href="/static/css/main.css">
+    <title>login</title>
+    <script src="/static/js/signup-login.js"></script>
+</head>
+<body>
+    <h1>login</h1>
+    <p>{{.Message}}</p>
+    <p>user login</p>
+    <form id="passwordForm" action="/login" method="POST">
+        <div>
+            <input type="text" name="username" placeholder="username" autocomplete="off">
+        </div>
+        <div>
+            <input type="password" id="password" name="password" placeholder="password" autocomplete="off">
+            <p>※パスワードは半角英数字をそれぞれ1種類以上含み、8文字以上100文字以下である必要があります。</p>
+            <p>(以下の記号が使用可能'!@#$%^&*()_+-=')</p>
+        </div>
+        <p><input type="submit" value="login"></p>
+    </form>
+    <p><a href="/signup">サインアップ</a></p>
+    <p><a href="/">戻る</a></p>
+</body>
+</html>

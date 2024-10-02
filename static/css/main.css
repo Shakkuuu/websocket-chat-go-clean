@@ -1,0 +1,34 @@
+body {
+    background-color: azure;
+}
+textarea {
+    width: 400px;
+    height: 100px;
+}
+input[type="number"] {
+    width: 120px;
+}
+.scroll{
+    height: 90vh;
+    width: 50vh;
+    overflow: auto;
+}
+.chatback{
+    height: 90vh;
+    width: 60vh;
+    background-color: lightcyan;
+}
+.container{
+    display: flex;
+    background-color: azure;
+}
+.left, .right {
+    flex: 1;
+}
+ul {
+    white-space: pre-wrap;
+}
+#inputStatus {
+    display: none;
+    color: #888;
+}
