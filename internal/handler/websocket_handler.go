@@ -52,7 +52,7 @@ var sentmessage = make(chan Message) // 各クライアントに送信するた�
 // WebsocketでRoom参加後のコネクション確立
 func (h *WebsocketHandler) HandleConnection(ws *websocket.Conn) {
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 24*time.Hour)
 	defer cancel()
 
 	defer ws.Close()

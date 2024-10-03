@@ -260,6 +260,36 @@ func (h *RoomHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		roomid := r.URL.Query().Get("roomid")
 
+		intRoomID, err := strconv.Atoi(roomid)
+		if err != nil {
+			log.Printf("strconv.Atoi error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = "ルームIDの形式が正しくありません。"
+
+			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
+		if intRoomID < 1 || 9999 < intRoomID {
+			log.Println("ルームIDの範囲外です。")
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = "ルームIDの範囲外です。"
+
+			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
+
 		// Roomが存在するか確認
 		exists, err := h.roomUsecase.IDExists(ctx, roomid)
 		if err != nil {

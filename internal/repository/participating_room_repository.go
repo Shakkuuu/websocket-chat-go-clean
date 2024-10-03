@@ -44,15 +44,15 @@ func (r *ParticipatingRoomRepo) Create(ctx context.Context, participatingRoom *d
 }
 
 func (r *ParticipatingRoomRepo) DeleteByUserID(ctx context.Context, userID string) error {
-	return r.Db.WithContext(ctx).Where("user_id = ?", userID).Delete(&domain.User{}).Error
+	return r.Db.WithContext(ctx).Where("user_id = ?", userID).Delete(&domain.ParticipatingRoom{}).Error
 }
 
 func (r *ParticipatingRoomRepo) DeleteByRoomID(ctx context.Context, roomID string) error {
-	return r.Db.WithContext(ctx).Where("room_id = ?", roomID).Delete(&domain.User{}).Error
+	return r.Db.WithContext(ctx).Where("room_id = ?", roomID).Delete(&domain.ParticipatingRoom{}).Error
 }
 
 func (r *ParticipatingRoomRepo) DeleteByUserIDAndRoomID(ctx context.Context, userID, roomID string) error {
-	return r.Db.WithContext(ctx).Where("user_id = ?", userID).Where("room_id = ?", userID).Delete(&domain.User{}).Error
+	return r.Db.WithContext(ctx).Where("user_id = ?", userID).Where("room_id = ?", roomID).Delete(&domain.ParticipatingRoom{}).Error
 }
 
 func (r *ParticipatingRoomRepo) GetUsersByRoomID(ctx context.Context, roomID string) (*domain.Users, error) {

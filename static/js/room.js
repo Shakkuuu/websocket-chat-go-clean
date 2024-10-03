@@ -143,7 +143,6 @@ function deleteorleaveRoom(){
     let rid = room_id;
 	if(window.confirm('本当にRoomを削除または離脱しますか？(Roomの作成者の場合はRoomが削除されます。)')){
 		window.location.href = protocol + "//" + domain + ":" + port + '/deleteroom?roomid=' + rid;
-        window.location.href = protocol + "//" + domain + ":" + port + '/leaveroom?roomid=' + rid;
         return
 	}
 	else{

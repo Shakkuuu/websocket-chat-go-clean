@@ -10,7 +10,7 @@ const (
 	nameLengthMax = 100
 	nameLengthMin = 1
 	passLengthMax = 100
-	passLengthMin = 6
+	passLengthMin = 8
 )
 
 type Users []User
@@ -37,16 +37,16 @@ func (u *User) Validate() error {
 	}
 
 	if len(u.Password) < passLengthMin || len(u.Password) > passLengthMax {
-		return errors.New("password の値は6文字以上100文字以内にしてください")
+		return errors.New("password の値は8文字以上100文字以内にしてください")
 	}
 
-	passPattern := `^[a-zA-Z\d!@#$%^&*()_+\-=\[\]]{6,100}$`
+	passPattern := `^[a-zA-Z\d!@#$%^&*()_+\-=\[\]]{8,100}$`
 	matched, err := regexp.MatchString(passPattern, u.Password)
 	if err != nil {
 		return err
 	}
 	if !matched {
-		return errors.New("パスワードは半角英数字をそれぞれ1種類以上含み、6文字以上100文字以下である必要があります。")
+		return errors.New("パスワードは半角英数字をそれぞれ1種類以上含み、8文字以上100文字以内である必要があります。")
 	}
 
 	hasLetter := false
@@ -62,7 +62,7 @@ func (u *User) Validate() error {
 	}
 
 	if !(hasLetter && hasDigit) {
-		return errors.New("パスワードは半角英数字をそれぞれ1種類以上含み、6文字以上100文字以下である必要があります。")
+		return errors.New("パスワードは半角英数字をそれぞれ1種類以上含み、8文字以上100文字以内である必要があります。")
 	}
 
 	return nil
