@@ -8,6 +8,8 @@ WebosocketとGo言語を主に使用した、リアルタイム性のあるチ�
 
 使用方法は[https://github.com/Shakkuuu/websocket-chat-go](https://github.com/Shakkuuu/websocket-chat-go)をご確認ください。
 
+アクセス：[https://chat.shakku.com](https://chat.shakku.com)
+
 ## メモ
 
 - セキュリティ面 XSSとか対策　、バリデーション ok
@@ -15,3 +17,4 @@ WebosocketとGo言語を主に使用した、リアルタイム性のあるチ�
 - チャットの中身変なもの送信できないようにする ok
 - ローカルの時はroom.jsのwssをwsにする。
 - userとroomのバリデーションはOK。あとはメッセージのバリデーションと対策 ok
+- ユーザ名の変更機能

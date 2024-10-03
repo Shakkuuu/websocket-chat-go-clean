@@ -386,8 +386,7 @@ func (h *UserHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// hashpass, err := model.HashPass(password)
-		hp, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		hp, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
 			log.Printf("bcrypt.GenerateFromPassword error: %v\n", err)
 			// メッセージをテンプレートに渡す
@@ -402,12 +401,11 @@ func (h *UserHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		hashpass := string(hp)
 
 		updatedUser := domain.User{
 			ID:        user.ID,
 			Name:      user.Name,
-			Password:  hashpass,
+			Password:  string(hp),
 			CreatedAt: user.CreatedAt,
 		}
 
