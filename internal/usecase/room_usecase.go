@@ -10,6 +10,8 @@ import (
 	"github.com/Shakkuuu/websocket-chat-go-clean/internal/repository"
 )
 
+//go:generate mockgen -source=$GOFILE -destination=../mock/$GOPACKAGE/room_mock.go -package=mock_$GOPACKAGE
+
 type RoomUsecase interface {
 	GetAll(ctx context.Context) (*domain.Rooms, error)
 	Create(ctx context.Context, user *domain.Room) (*domain.Room, error)

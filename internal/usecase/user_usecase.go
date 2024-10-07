@@ -11,6 +11,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+//go:generate mockgen -source=$GOFILE -destination=../mock/$GOPACKAGE/user_mock.go -package=mock_$GOPACKAGE
+
 type UserUsecase interface {
 	GetAll(ctx context.Context) (*domain.Users, error)
 	GetByID(ctx context.Context, id string) (*domain.User, error)

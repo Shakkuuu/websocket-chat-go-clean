@@ -43,9 +43,9 @@ func Run(cfg *config.Config, accessfile, chatLogFile *os.File) {
 	userRepo := repository.NewUserRepo(pg)
 	participatingRoomRepo := repository.NewParticipatingRoomRepo(pg)
 	roomRepo := repository.NewRoomRepo(pg)
-	userUsecase := usecase.NewUserUsecase(*userRepo)
-	participatingRoomUsecase := usecase.NewParticipatingRoomUsecase(*participatingRoomRepo)
-	roomUsecase := usecase.NewRoomUsecase(*roomRepo)
+	userUsecase := usecase.NewUserUsecase(userRepo)
+	participatingRoomUsecase := usecase.NewParticipatingRoomUsecase(participatingRoomRepo)
+	roomUsecase := usecase.NewRoomUsecase(roomRepo)
 
 	// User
 	userHandler := handler.NewUserHandler(userUsecase, participatingRoomUsecase, roomUsecase, newSession)
