@@ -62,15 +62,15 @@ func (s *Sessions) GetUserData(r *http.Request) (string, string, error) {
 	return i, un, nil
 }
 
-func (s *Sessions) Set(r *http.Request, w http.ResponseWriter, id, username string) {
+func (s *Sessions) Set(r *http.Request, w http.ResponseWriter, id, username string) error {
 	s.Session, _ = s.Store.Get(r, SESSION_NAME)
 	s.Session.Values["id"] = id
 	s.Session.Values["username"] = username
-	s.Session.Save(r, w)
+	return s.Session.Save(r, w)
 }
 
-func (s *Sessions) Delete(r *http.Request, w http.ResponseWriter) {
+func (s *Sessions) Delete(r *http.Request, w http.ResponseWriter) error {
 	// セッション削除
 	s.Session.Options.MaxAge = -1
-	s.Session.Save(r, w)
+	return s.Session.Save(r, w)
 }

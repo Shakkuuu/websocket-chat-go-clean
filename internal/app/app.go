@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -32,9 +33,18 @@ func Run(cfg *config.Config, accessfile, chatLogFile *os.File) {
 		log.Fatal(fmt.Errorf("app.Run.postgres.New: %w", err))
 	}
 	defer pg.Close()
-	pg.Db.AutoMigrate(&domain.User{})
-	pg.Db.AutoMigrate(&domain.ParticipatingRoom{})
-	pg.Db.AutoMigrate(&domain.Room{})
+	err = pg.Db.AutoMigrate(&domain.User{})
+	if err != nil {
+		log.Fatal(fmt.Errorf("app - Run - pg.Db.AutoMigrate - User: %w", err))
+	}
+	err = pg.Db.AutoMigrate(&domain.ParticipatingRoom{})
+	if err != nil {
+		log.Fatal(fmt.Errorf("app - Run - pg.Db.AutoMigrate - ParticipatingRoom: %w", err))
+	}
+	err = pg.Db.AutoMigrate(&domain.Room{})
+	if err != nil {
+		log.Fatal(fmt.Errorf("app - Run - pg.Db.AutoMigrate - Room: %w", err))
+	}
 	insertTokumei(pg)
 
 	newSession := session.New()
@@ -58,7 +68,11 @@ func Run(cfg *config.Config, accessfile, chatLogFile *os.File) {
 	mux.Handle("/username", loggingMiddleware(http.HandlerFunc(userHandler.GetUserName)))          // 自身のユーザー名取得
 
 	// Room
-	roomHandler := handler.NewRoomHandler(userUsecase, participatingRoomUsecase, roomUsecase, newSession)
+	rooms, err := getRooms(roomUsecase)
+	if err != nil {
+		log.Fatal(fmt.Errorf("app - Run - getRooms: %w", err))
+	}
+	roomHandler := handler.NewRoomHandler(userUsecase, participatingRoomUsecase, roomUsecase, newSession, rooms)
 	mux.Handle("/", loggingMiddleware(http.HandlerFunc(roomHandler.Top)))                    // roomtopページ
 	mux.Handle("/room", loggingMiddleware(http.HandlerFunc(roomHandler.Room)))               // Room内のページ
 	mux.Handle("/deleteroom", loggingMiddleware(http.HandlerFunc(roomHandler.Delete)))       // Room削除
@@ -122,4 +136,12 @@ func insertTokumei(pg *postgres.Postgres) {
 		log.Printf("db.Create tokumei error: %v\n", err)
 	}
 	log.Println("匿名ユーザーが登録されました。")
+}
+
+func getRooms(roomUsecase usecase.RoomUsecase) (*domain.Rooms, error) {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	return roomUsecase.GetAll(ctx)
 }

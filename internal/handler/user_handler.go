@@ -171,7 +171,21 @@ func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// セッション削除
-		h.session.Delete(r, w)
+		err = h.session.Delete(r, w)
+		if err != nil {
+			log.Printf("session.Delete error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = fmt.Sprintf("セッションの処理に失敗しました。(%v)", err)
+
+			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 
 		// ユーザーが作成したRoomの削除
 		prooms, err := h.participatingRoomUsecase.GetByUserID(ctx, user.ID)
@@ -289,7 +303,21 @@ func (h *UserHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 		defer cancel()
 
-		r.ParseForm()
+		err := r.ParseForm()
+		if err != nil {
+			log.Printf("r.ParseForm error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = fmt.Sprintf("入力された値の読み取りに失敗しました。(%v)", err)
+
+			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 		oldpassword := r.FormValue("oldpassword")
 		password := r.FormValue("password")
 		checkpass := r.FormValue("checkpassword")
@@ -427,7 +455,21 @@ func (h *UserHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// 再ログイン用に一度セッション削除
-		h.session.Delete(r, w)
+		err = h.session.Delete(r, w)
+		if err != nil {
+			log.Printf("session.Delete error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = fmt.Sprintf("セッションの処理に失敗しました。(%v)", err)
+
+			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 
 		// メッセージをテンプレートに渡す
 		var data Data
@@ -462,7 +504,21 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		defer cancel()
 
 		// POSTされたものをFormから受け取り
-		r.ParseForm()
+		err := r.ParseForm()
+		if err != nil {
+			log.Printf("r.ParseForm error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = fmt.Sprintf("入力された値の読み取りに失敗しました。(%v)", err)
+
+			err = h.templates.ExecuteTemplate(w, "signup.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 		checkpass := r.FormValue("checkpassword")
@@ -501,7 +557,7 @@ func (h *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// ユーザー追加
-		err := h.userUsecase.Create(ctx, &user)
+		err = h.userUsecase.Create(ctx, &user)
 		if err != nil {
 			log.Printf("model.AddUser error: %v\n", err)
 			// メッセージをテンプレートに渡す
@@ -549,7 +605,21 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		defer cancel()
 
 		// POSTされたものをFormから受け取り
-		r.ParseForm()
+		err := r.ParseForm()
+		if err != nil {
+			log.Printf("r.ParseForm error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = fmt.Sprintf("入力された値の読み取りに失敗しました。(%v)", err)
+
+			err = h.templates.ExecuteTemplate(w, "login.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 
@@ -620,7 +690,20 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		var data Data
 		data.Message = "ログインに成功しました。"
 
-		h.session.Set(r, w, user.ID, user.Name)
+		err = h.session.Set(r, w, user.ID, user.Name)
+		if err != nil {
+			log.Printf("session.Set error: %v\n", err)
+			var data Data
+			data.Message = "セッション作成時にエラーが発生しました。"
+
+			err := h.templates.ExecuteTemplate(w, "login.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 
 		err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
 		if err != nil {
@@ -640,13 +723,27 @@ func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		// セッション削除
-		h.session.Delete(r, w)
+		err := h.session.Delete(r, w)
+		if err != nil {
+			log.Printf("session.Delete error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = fmt.Sprintf("セッションの処理に失敗しました。(%v)", err)
+
+			err = h.templates.ExecuteTemplate(w, "usermenu.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 
 		// メッセージをテンプレートに渡す
 		var data Data
 		data.Message = "ログアウトしました。ログインしてください。"
 
-		err := h.templates.ExecuteTemplate(w, "login.html", data)
+		err = h.templates.ExecuteTemplate(w, "login.html", data)
 		if err != nil {
 			log.Printf("templates.ExecuteTemplate error:%v\n", err)
 			http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)

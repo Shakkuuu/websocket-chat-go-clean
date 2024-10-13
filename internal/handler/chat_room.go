@@ -1,11 +1,9 @@
 package handler
 
 import (
-	"context"
 	"fmt"
-	"time"
 
-	"github.com/Shakkuuu/websocket-chat-go-clean/internal/usecase"
+	"github.com/Shakkuuu/websocket-chat-go-clean/internal/domain"
 	"golang.org/x/net/websocket"
 )
 
@@ -18,21 +16,10 @@ type ChatRoom struct {
 // 作成された各ルームを格納
 var rooms = make(map[string]*ChatRoom)
 
-func roomInit(roomUsecase usecase.RoomUsecase) error {
-	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-
-	rooms, err := roomUsecase.GetAll(ctx)
-	if err != nil {
-		return err
-	}
-
+func roomInit(rooms *domain.Rooms) {
 	for _, room := range *rooms {
 		createRoom(room.ID)
 	}
-
-	return nil
 }
 
 // RoomMap一覧取得

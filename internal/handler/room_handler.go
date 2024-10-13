@@ -23,6 +23,7 @@ type RoomHandler struct {
 	roomUsecase              usecase.RoomUsecase
 	templates                *template.Template
 	session                  *session.Sessions
+	rooms                    *domain.Rooms
 }
 
 func NewRoomHandler(
@@ -30,15 +31,17 @@ func NewRoomHandler(
 	participatingRoomUsecase usecase.ParticipatingRoomUsecase,
 	roomUsecase usecase.RoomUsecase,
 	s *session.Sessions,
+	rooms *domain.Rooms,
 ) *RoomHandler {
 	templates := template.Must(template.ParseGlob("internal/handler/templates/*.html"))
-	roomInit(roomUsecase)
+	roomInit(rooms)
 	return &RoomHandler{
 		userUsecase:              usecase,
 		participatingRoomUsecase: participatingRoomUsecase,
 		roomUsecase:              roomUsecase,
 		templates:                templates,
 		session:                  s,
+		rooms:                    rooms,
 	}
 }
 
@@ -171,7 +174,21 @@ func (h *RoomHandler) Room(w http.ResponseWriter, r *http.Request) {
 		defer cancel()
 
 		// クエリ読み取り
-		r.ParseForm()
+		err := r.ParseForm()
+		if err != nil {
+			log.Printf("r.ParseForm error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = fmt.Sprintf("入力された値の読み取りに失敗しました。(%v)", err)
+
+			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 		roomid := r.URL.Query().Get("roomid")
 
 		intRoomID, err := strconv.Atoi(roomid)
@@ -257,7 +274,21 @@ func (h *RoomHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		defer cancel()
 
 		// クエリ読み取り
-		r.ParseForm()
+		err := r.ParseForm()
+		if err != nil {
+			log.Printf("r.ParseForm error: %v\n", err)
+			// メッセージをテンプレートに渡す
+			var data Data
+			data.Message = fmt.Sprintf("入力された値の読み取りに失敗しました。(%v)", err)
+
+			err = h.templates.ExecuteTemplate(w, "roomtop.html", data)
+			if err != nil {
+				log.Printf("templates.ExecuteTemplate error:%v\n", err)
+				http.Error(w, "ページの表示に失敗しました。", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
 		roomid := r.URL.Query().Get("roomid")
 
 		intRoomID, err := strconv.Atoi(roomid)
