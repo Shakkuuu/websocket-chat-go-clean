@@ -9,7 +9,6 @@ import (
 
 	"github.com/Shakkuuu/websocket-chat-go-clean/internal/domain"
 	mock_repository "github.com/Shakkuuu/websocket-chat-go-clean/internal/mock/repository"
-	"github.com/Shakkuuu/websocket-chat-go-clean/internal/repository"
 	"go.uber.org/mock/gomock"
 )
 
@@ -396,9 +395,6 @@ func Test_participatingRoomUsecase_DeleteByUserID(t *testing.T) {
 }
 
 func Test_participatingRoomUsecase_DeleteByRoomID(t *testing.T) {
-	type fields struct {
-		repo repository.ParticipatingRoomRepo
-	}
 	type args struct {
 		ctx    context.Context
 		roomID string
@@ -446,9 +442,6 @@ func Test_participatingRoomUsecase_DeleteByRoomID(t *testing.T) {
 }
 
 func Test_participatingRoomUsecase_DeleteByUserIDAndRoomID(t *testing.T) {
-	type fields struct {
-		repo repository.ParticipatingRoomRepo
-	}
 	type args struct {
 		ctx    context.Context
 		userID string
