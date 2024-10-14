@@ -559,7 +559,12 @@ func (h *RoomHandler) JoinRoomsList(w http.ResponseWriter, r *http.Request) {
 
 		// jsonで送信
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(sentjson)
+		_, err = w.Write(sentjson)
+		if err != nil {
+			log.Printf("w.Write error: %v\n", err)
+			http.Error(w, "response write error", http.StatusInternalServerError)
+			return
+		}
 	default:
 		fmt.Fprintln(w, "Method not allowed")
 		http.Error(w, "そのメソッドは許可されていません。", http.StatusMethodNotAllowed)
@@ -600,8 +605,12 @@ func (h *RoomHandler) RoomsList(w http.ResponseWriter, r *http.Request) {
 
 		// jsonで送信
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(sentjson)
-
+		_, err = w.Write(sentjson)
+		if err != nil {
+			log.Printf("w.Write error: %v\n", err)
+			http.Error(w, "response write error", http.StatusInternalServerError)
+			return
+		}
 	default:
 		fmt.Fprintln(w, "Method not allowed")
 		http.Error(w, "そのメソッドは許可されていません。", http.StatusMethodNotAllowed)
